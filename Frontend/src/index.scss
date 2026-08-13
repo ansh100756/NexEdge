@@ -1,0 +1,51 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #fff9f2;
+  background: #14131f;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  /* NexEdge — light, warm editorial palette */
+  --color-bg-primary: #14131f;
+  --color-bg-secondary: #1d1a2a;
+  --color-surface: #2a263a;
+  --color-surface-soft: #332e45;
+  --color-surface-hover: #3a344e;
+  --color-border: rgba(255, 244, 230, 0.14);
+  --color-border-strong: rgba(255, 244, 230, 0.24);
+
+  --color-text-primary: #fff9f2;
+  --color-text-secondary: #c9c1c9;
+  --color-text-muted: #958d9d;
+
+  --color-primary: #b58be8;
+  --color-primary-light: #d7b8f6;
+  --color-rose: #e5a7a1;
+  --color-peach: #f0c39a;
+  --color-sage: #9fc6b1;
+  --color-gold: #e8c98d;
+  --color-success: #8ed8b0;
+  --color-error: #f0a5a3;
+  --color-cream: #fff1df;
+
+  --gradient-primary: linear-gradient(115deg, #a986e7 0%, #c99ee5 45%, #efbd9b 100%);
+  --gradient-accent: linear-gradient(115deg, #d99e9e 0%, #d9b4e7 48%, #9cc8b3 100%);
+  --gradient-soft: linear-gradient(135deg, rgba(208, 166, 234, 0.18), rgba(240, 195, 154, 0.12), rgba(159, 198, 177, 0.12));
+  --shadow-card: 0 34px 90px rgba(5, 4, 13, 0.42), 0 12px 34px rgba(102, 77, 126, 0.12);
+}
+
+* { box-sizing: border-box; }
+html { min-width: 320px; background: var(--color-bg-primary); scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+button, input { font: inherit; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--color-primary-light); outline-offset: 3px; }
+::selection { color: #241d2a; background: #f0c39a; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,15 @@
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-bottom: 1px;
+  padding: 11px 12px;
+  border: 1px solid rgba(240, 165, 163, 0.25);
+  border-radius: 13px;
+  color: #f3c1bc;
+  background: linear-gradient(135deg, rgba(240, 165, 163, 0.11), rgba(217, 164, 206, 0.05));
+  font-size: 13px;
+  animation: shake 0.3s ease;
+}
+@keyframes shake { 20% { transform: translateX(-3px); } 40% { transform: translateX(2px); } 60% { transform: translateX(-1px); } 80% { transform: translateX(1px); } }
+@media (prefers-reduced-motion: reduce) { .alert { animation: none; } }

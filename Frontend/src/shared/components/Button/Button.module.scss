@@ -1,0 +1,41 @@
+.button {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  width: 100%;
+  min-height: 54px;
+  border: 1px solid rgba(255, 248, 239, 0.20);
+  border-radius: 15px;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  color: #2a2230;
+  background: var(--gradient-primary);
+  box-shadow: 0 17px 36px rgba(119, 88, 142, 0.28), inset 0 1px rgba(255,255,255,0.36);
+  font: inherit;
+  font-weight: 850;
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, filter 0.22s ease;
+}
+.button::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+  left: -42%;
+  width: 30%;
+  transform: skewX(-20deg);
+  background: rgba(255,255,255,0.30);
+  transition: transform 0.6s ease;
+}
+.button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 22px 44px rgba(119, 88, 142, 0.34), inset 0 1px rgba(255,255,255,0.42); filter: saturate(1.05) brightness(1.04); }
+.button:hover:not(:disabled)::before { transform: translateX(430%) skewX(-20deg); }
+.button:active:not(:disabled) { transform: translateY(0); }
+.button:disabled { opacity: 0.62; cursor: not-allowed; }
+.spinner { animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 560px) { .button { min-height: 52px; border-radius: 14px; } }
+@media (prefers-reduced-motion: reduce) { .button, .button::before { transition: none; } .spinner { animation: none; } }

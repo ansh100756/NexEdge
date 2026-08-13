@@ -1,0 +1,11 @@
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowRight, Eye, EyeOff, Mail, LockKeyhole } from 'lucide-react';
+import { useState } from 'react';
+import { useAuth } from '../../state/AuthContext';
+import { useAuthForm } from '../../hooks/useAuthForm';
+import { Button } from '../../../../shared/components/Button/Button';
+import { Input } from '../../../../shared/components/Input/Input';
+import { Alert } from '../../../../shared/components/Alert/Alert';
+import styles from './LoginForm.module.scss';
+
+export function LoginForm(){const {login,loading}=useAuth();const nav=useNavigate();const {form,errors,serverError,setServerError,update,validate}=useAuthForm('login');const [show,setShow]=useState(false);const submit=async e=>{e.preventDefault();if(!validate())return;const r=await login({email:form.email.trim(),password:form.password});if(r.success)nav('/dashboard',{replace:true});else setServerError(r.error?.message || r.message || "Unable to sign in.")};return <section className={styles.card}><div className={styles.topline}><span className={styles.dot}/>NEXEDGE</div><div className={styles.kicker}><span/>WELCOME BACK</div><h1>Sign in<span>.</span></h1><p className={styles.subtitle}>Welcome back. Enter your details to continue to your workspace.</p>{serverError&&<Alert type="error">{serverError}</Alert>}<form onSubmit={submit} noValidate><Input label="Email address" name="email" value={form.email} onChange={update} placeholder="you@example.com" autoComplete="email" error={errors.email} icon={<Mail size={18}/>} /><Input label="Password" name="password" type={show?'text':'password'} value={form.password} onChange={update} placeholder="Enter your password" autoComplete="current-password" error={errors.password} icon={<LockKeyhole size={18}/>} endAdornment={<button type="button" className={styles.eye} onClick={()=>setShow(v=>!v)} aria-label={show?'Hide password':'Show password'}>{show?<EyeOff size={18}/>:<Eye size={18}/>}</button>}/><div className={styles.forgot}><button type="button" onClick={()=>setServerError('Password recovery will be connected to the authentication service.')}>Forgot password?</button></div><Button type="submit" loading={loading}>Sign in <ArrowRight size={18}/></Button></form><p className={styles.switch}>New to NexEdge? <Link to="/register">Create an account</Link></p></section>}
