@@ -103,12 +103,27 @@ export async function login(req, res) {
     res.status(200).json({
         message: "Login successful",
         success: true,
+        redirectTo: "/api/files/dashboard",
         user: {
             id: user._id,
             email: user.email
         }
     })
 
+}
+
+/**
+ * @desc Logout current user
+ * @route POST /api/auth/logout
+ * @access Private
+ */
+export async function logout(req, res) {
+    res.clearCookie("token");
+
+    return res.status(200).json({
+        message: "Logout successful",
+        success: true
+    })
 }
 
 
