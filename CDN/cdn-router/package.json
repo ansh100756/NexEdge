@@ -1,0 +1,19 @@
+{
+  "name": "cdn-router",
+  "version": "1.0.0",
+  "description": "NexEdge CDN Router - selects nearest healthy edge, enforces auth via origin, proxies the response.",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}
