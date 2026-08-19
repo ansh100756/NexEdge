@@ -1,0 +1,20 @@
+{
+  "name": "edge-server",
+  "version": "1.0.0",
+  "description": "Reusable NexEdge CDN edge-cache server. One codebase, configured per-location via .env.",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "cp": "^0.2.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "pino": "^10.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}
