@@ -6,10 +6,11 @@ const port = Number(process.env.PORT) || 3000;
 
 connectToDB()
   .then(() => {
-    app.listen(port, () => {
-      console.log(`Server started at http://localhost:${port}`);
+    app.listen(port, "0.0.0.0", () => {
+      console.log(`Server started on port ${port}`);
     });
   })
   .catch((error) => {
     console.error("Failed to initialize MongoDB:", error);
+    process.exitCode = 1;
   });

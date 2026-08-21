@@ -2,14 +2,21 @@ import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   CalendarDays,
+  Database,
   Download,
   FileText,
+  LoaderCircle,
   LockKeyhole,
+  MapPin,
+  Route,
   Share2,
   UserRound,
+  WifiOff,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { apiUrl } from "../../../config/api";
+import { useCdn } from "../../cdn/CdnContext";
+import { cdnService } from "../../cdn/cdn.service";
 import FileViewer from "../components/FileViewer";
 import ShareDialog from "../components/ShareDialog";
 import { fileService } from "../file.service";
@@ -17,13 +24,22 @@ import { fileKind, formatBytes, formatDate } from "../file.utils";
 
 export default function FilePage() {
   const { fileId } = useParams();
+  const { location } = useCdn();
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [delivery, setDelivery] = useState(null);
+  const [deliveryLoading, setDeliveryLoading] = useState(false);
+  const [deliveryError, setDeliveryError] = useState("");
+  const [deliveryAttempt, setDeliveryAttempt] = useState(0);
   const [showShareDialog, setShowShareDialog] = useState(false);
 
   useEffect(() => {
     async function loadFile() {
+      setFile(null);
+      setLoading(true);
+      setError("");
+
       try {
         const result = await fileService.open(fileId);
         setFile(result.file);
@@ -36,6 +52,46 @@ export default function FilePage() {
 
     loadFile();
   }, [fileId]);
+
+  useEffect(() => {
+    if (!file) return undefined;
+
+    const controller = new AbortController();
+    let previewUrl = "";
+
+    async function loadFromCdn() {
+      setDelivery(null);
+      setDeliveryLoading(true);
+      setDeliveryError("");
+
+      try {
+        const result = await cdnService.deliver(fileId, location, {
+          signal: controller.signal,
+        });
+        previewUrl = URL.createObjectURL(result.blob);
+        setDelivery({ ...result, url: previewUrl });
+      } catch (requestError) {
+        if (requestError.name !== "AbortError") {
+          setDeliveryError(requestError.message);
+        }
+      } finally {
+        if (!controller.signal.aborted) setDeliveryLoading(false);
+      }
+    }
+
+    loadFromCdn();
+
+    return () => {
+      controller.abort();
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [
+    deliveryAttempt,
+    file,
+    fileId,
+    location.latitude,
+    location.longitude,
+  ]);
 
   if (loading) {
     return (
@@ -138,10 +194,64 @@ export default function FilePage() {
         <div className="viewer-toolbar">
           <div>
             <span className="live-dot" />
-            Secure preview
+            Secure CDN preview
+          </div>
+
+          <div className="delivery-details" aria-live="polite">
+            {deliveryLoading && (
+              <span>
+                <LoaderCircle className="spin" size={14} />
+                Finding nearest edge
+              </span>
+            )}
+
+            {delivery && (
+              <>
+                <span title="Serving edge">
+                  <MapPin size={14} />
+                  {delivery.edge}
+                </span>
+                <span
+                  className={delivery.cacheStatus === "HIT" ? "cache-hit" : ""}
+                  title="Edge cache status"
+                >
+                  <Database size={14} />
+                  Cache {delivery.cacheStatus}
+                </span>
+                {delivery.distanceKm && (
+                  <span title="Distance from your routing location">
+                    <Route size={14} />
+                    {delivery.distanceKm} km
+                  </span>
+                )}
+              </>
+            )}
           </div>
         </div>
-        <FileViewer file={file} />
+
+        {deliveryError && (
+          <div className="delivery-error">
+            <WifiOff size={32} />
+            <h3>CDN delivery unavailable</h3>
+            <p>{deliveryError}</p>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setDeliveryAttempt((attempt) => attempt + 1)}
+            >
+              Try CDN again
+            </button>
+          </div>
+        )}
+
+        {deliveryLoading && (
+          <div className="delivery-loader">
+            <span className="spinner" />
+            <p>Authorizing access and routing to the nearest healthy edge…</p>
+          </div>
+        )}
+
+        {delivery && <FileViewer file={file} url={delivery.url} />}
       </section>
 
       {showShareDialog && (

@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import AuthPage from "./features/auth/AuthPage";
 import { useAuth } from "./features/auth/AuthContext";
+import { CdnProvider } from "./features/cdn/CdnContext";
 import AppShell from "./features/files/components/AppShell";
 import FilePage from "./features/files/pages/FilePage";
 import FilesPage from "./features/files/pages/FilesPage";
@@ -21,7 +22,11 @@ function PrivateRoutes() {
     return <Navigate to="/login" replace />;
   }
 
-  return <AppShell />;
+  return (
+    <CdnProvider>
+      <AppShell />
+    </CdnProvider>
+  );
 }
 
 export default function AppRoutes() {

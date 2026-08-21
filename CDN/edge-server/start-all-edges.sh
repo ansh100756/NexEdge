@@ -8,7 +8,7 @@
 set -e
 cd "$(dirname "$0")"
 
-CITIES=(delhi mumbai kolkata bangalore )
+CITIES=(delhi mumbai kolkata bangalore chennai)
 PIDS=()
 
 cleanup() {
@@ -23,7 +23,9 @@ trap cleanup INT TERM
 
 for city in "${CITIES[@]}"; do
   echo "Starting edge: $city"
-  env $(cat "env-examples/.env.$city" | xargs) node src/server.js &
+  # Remove Windows CRLF characters before passing values to Node.
+  # Without this, CACHE_DIR ends with \r and creates an invalid path.
+  env $(tr -d '\r' < "env-examples/.env.$city" | xargs) node src/server.js &
   PIDS+=($!)
   sleep 0.5
 done

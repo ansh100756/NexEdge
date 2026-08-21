@@ -1,6 +1,17 @@
-import { Cloud, Files, LogOut, RadioTower, Share2 } from "lucide-react";
+import {
+  Cloud,
+  Crosshair,
+  Files,
+  LoaderCircle,
+  LogOut,
+  RadioTower,
+  Share2,
+  WifiOff,
+} from "lucide-react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { USES_GLOBAL_CDN } from "../../../config/cdn";
 import { useAuth } from "../../auth/AuthContext";
+import { useCdn } from "../../cdn/CdnContext";
 import ThemeToggle from "../../theme/ThemeToggle";
 
 const navigation = [
@@ -10,6 +21,16 @@ const navigation = [
 
 export default function AppShell() {
   const { user, logout } = useAuth();
+  const {
+    activeEdges,
+    edges,
+    location: deliveryLocation,
+    locating,
+    locationError,
+    networkError,
+    networkLoading,
+    useCurrentLocation,
+  } = useCdn();
   const location = useLocation();
   const navigate = useNavigate();
   const currentView = new URLSearchParams(location.search).get("view") || "owned";
@@ -36,6 +57,21 @@ export default function AppShell() {
     ));
   }
 
+  const networkOffline = Boolean(networkError)
+    || (!networkLoading && activeEdges.length === 0);
+  const edgeLabel = networkLoading
+    ? "Checking edges"
+    : networkError
+      ? "CDN offline"
+      : activeEdges.length === 0
+        ? "No healthy edges"
+        : USES_GLOBAL_CDN
+          ? "Global CDN online"
+        : `${activeEdges.length}/${edges.length} edges online`;
+
+  const locationLabel = locationError
+    || `Route from ${deliveryLocation.label}. Select to use your location.`;
+
   return (
     <div className="app-shell">
       <div className="ambient ambient-one" aria-hidden="true" />
@@ -57,11 +93,29 @@ export default function AppShell() {
         </nav>
 
         <div className="topbar-actions">
-          <span className="edge-pill">
-            <span className="live-dot" />
-            <RadioTower size={16} />
-            3 edges online
+          <span
+            className={`edge-pill ${networkOffline ? "offline" : ""}`}
+            title={networkError || "Live CDN router health"}
+          >
+            <span className={`live-dot ${networkOffline ? "offline" : ""}`} />
+            {networkOffline ? <WifiOff size={16} /> : <RadioTower size={16} />}
+            {edgeLabel}
           </span>
+
+          {!USES_GLOBAL_CDN && (
+            <button
+              type="button"
+              className={`location-button icon-button ${locationError ? "has-error" : ""}`}
+              onClick={useCurrentLocation}
+              disabled={locating}
+              aria-label={locationLabel}
+              title={locationLabel}
+            >
+              {locating
+                ? <LoaderCircle className="spin" size={17} />
+                : <Crosshair size={17} />}
+            </button>
+          )}
 
           <div className="profile-pill">
             <span className="avatar">{user?.email?.[0]?.toUpperCase()}</span>

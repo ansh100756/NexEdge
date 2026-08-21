@@ -71,7 +71,12 @@ app.get("/files/:fileId", async (req, res) => {
   let authResult;
   try {
     const authRes = await fetch(`${ORIGIN_URL}/api/cdn/authorize/${fileId}`, {
-      headers: { Cookie: `token=${token}` },
+      headers: {
+        Cookie: `token=${token}`,
+        ...(process.env.CDN_SHARED_SECRET
+          ? { "X-NexEdge-CDN-Secret": process.env.CDN_SHARED_SECRET }
+          : {}),
+      },
     });
     authResult = await authRes.json();
 

@@ -1,6 +1,12 @@
 import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../services/mail.service.js";
+import {
+    authCookieOptions,
+    clearAuthCookieOptions,
+    getBackendUrl,
+    getFrontendUrl,
+} from "../config/app.js";
 
 
 /**
@@ -10,12 +16,11 @@ import { sendEmail } from "../services/mail.service.js";
  * @body { email, password }
  */
 export async function register(req, res) {
-
     const { email, password } = req.body;
 
     const isUserAlreadyExists = await userModel.findOne({
-        $or: [ { email } ]
-    })
+        $or: [{ email }]
+    });
 
     if (isUserAlreadyExists) {
         return res.status(400).json({
@@ -25,26 +30,36 @@ export async function register(req, res) {
         })
     }
 
-    const user = await userModel.create({ email, password })
+    const user = await userModel.create({ email, password });
 
     const emailVerificationToken = jwt.sign({
         email: user.email,
-    }, process.env.JWT_SECRET)
+    }, process.env.JWT_SECRET, { expiresIn: "24h" });
 
-    await sendEmail({
-        to: email,
-        subject: "Welcome to NexEdge!",
-        html: `
+    try {
+        await sendEmail({
+            to: email,
+            subject: "Welcome to NexEdge!",
+            html: `
                 <p>Hi,</p>
                 <p>Thank you for registering at <strong>NexEdge</strong>. We're excited to have you on board!</p>
                 <p>Please verify your email address by clicking the link below:</p>
-                <a href="http://localhost:3000/api/auth/verify-email?token=${emailVerificationToken}">Verify Email</a>
+                <a href="${getBackendUrl()}/api/auth/verify-email?token=${emailVerificationToken}">Verify Email</a>
                 <p>If you did not create an account, please ignore this email.</p>
                 <p>Best regards,<br>The NexEdge Team</p>
-        `
-    })
+            `
+        });
+    } catch (error) {
+        await userModel.findByIdAndDelete(user._id);
 
-    res.status(201).json({
+        return res.status(503).json({
+            message: "Verification email is unavailable. Please try again later.",
+            success: false,
+            err: "Email service unavailable"
+        });
+    }
+
+    return res.status(201).json({
         message: "User registered successfully",
         success: true,
         user: {
@@ -52,9 +67,6 @@ export async function register(req, res) {
             email: user.email
         }
     });
-
-
-
 }
 
 /**
@@ -98,7 +110,7 @@ export async function login(req, res) {
         id: user._id,
     }, process.env.JWT_SECRET, { expiresIn: '7d' })
 
-    res.cookie("token", token)
+    res.cookie("token", token, authCookieOptions())
 
     res.status(200).json({
         message: "Login successful",
@@ -118,7 +130,7 @@ export async function login(req, res) {
  * @access Private
  */
 export async function logout(req, res) {
-    res.clearCookie("token");
+    res.clearCookie("token", clearAuthCookieOptions());
 
     return res.status(200).json({
         message: "Logout successful",
@@ -186,7 +198,7 @@ export async function verifyEmail(req, res) {
             `
         <h1>Email Verified Successfully!</h1>
         <p>Your email has been verified. You can now log in to your account.</p>
-        <a href="${process.env.FRONTEND_URL || "http://localhost:5173"}/login">Go to Login</a>
+        <a href="${getFrontendUrl()}/login">Go to Login</a>
     `
 
         return res.send(html);

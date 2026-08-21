@@ -1,5 +1,10 @@
 # NexEdge CDN layer
 
+> Production uses the Cloudflare Worker in `CDN/cloudflare-worker`. The
+> Express router and disk-backed edge processes in this guide are retained for
+> local development and architecture demonstrations. See `../DEPLOYMENT.md`
+> for production deployment.
+
 This adds the CDN (Steps 4-15 from your plan) on top of your existing
 Backend, without changing anything that already works. Three pieces:
 

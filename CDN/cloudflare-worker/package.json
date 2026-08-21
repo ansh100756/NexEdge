@@ -1,0 +1,15 @@
+{
+  "name": "nexedge-cloudflare-worker",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "check": "node --check src/index.js",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "wrangler": "^4.32.0"
+  }
+}

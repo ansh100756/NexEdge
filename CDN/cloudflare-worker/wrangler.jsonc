@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "nexedge-cdn",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-21",
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    "CACHE_TTL_SECONDS": "300"
+  },
+  "secrets": {
+    "required": [
+      "ORIGIN_URL",
+      "FRONTEND_ORIGIN",
+      "CDN_SHARED_SECRET"
+    ]
+  }
+}

@@ -2,8 +2,8 @@ import { FileQuestion } from "lucide-react";
 
 const TEXT_TYPES = ["text/plain", "text/csv", "application/json"];
 
-export default function FileViewer({ file }) {
-  const { mimeType = "", url, originalName } = file;
+export default function FileViewer({ file, url }) {
+  const { mimeType = "", originalName } = file;
 
   if (mimeType.startsWith("image/")) {
     return (

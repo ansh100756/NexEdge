@@ -14,14 +14,24 @@ export async function request(path, options = {}) {
       },
     });
   } catch {
-    throw new Error("Cannot connect to the backend. Make sure it is running on port 3000.");
+    throw new Error("Cannot connect to the backend. Please try again shortly.");
   }
 
   const isJson = response.headers.get("content-type")?.includes("application/json");
   const data = isJson ? await response.json() : await response.text();
 
   if (!response.ok) {
-    throw new Error(data?.message || data?.errors?.[0]?.msg || "The request could not be completed.");
+    if (response.status === 502) {
+      throw new Error(
+        "The backend is temporarily unavailable. Please try again shortly.",
+      );
+    }
+
+    throw new Error(
+      data?.message
+      || data?.errors?.[0]?.msg
+      || "The request could not be completed.",
+    );
   }
 
   return data;
